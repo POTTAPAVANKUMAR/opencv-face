@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Face Recognition</title>
+</head>
+<body>
+    <h1>Face Recognition</h1>
+
+    <h2>Train Model</h2>
+    <form id="trainForm" enctype="multipart/form-data">
+        <input type="file" name="image1" accept="image/*">
+        <input type="text" name="label1" placeholder="Label for Image 1">
+        <br>
+        <input type="file" name="image2" accept="image/*">
+        <input type="text" name="label2" placeholder="Label for Image 2">
+        <br>
+        <!-- Add more inputs as needed -->
+        <button type="submit">Train Model</button>
+    </form>
+
+    <h2>Test Model</h2>
+    <form id="testForm" enctype="multipart/form-data">
+        <input type="file" name="file" accept="image/*">
+        <button type="submit">Test Model</button>
+    </form>
+
+    <h2>Result</h2>
+    <div id="result"></div>
+
+    <script>
+        document.getElementById('trainForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            var formData = new FormData(this);
+            var jsonData = {};
+            formData.forEach((value, key) => {
+                jsonData[key] = value;
+            });
+            fetch('/train', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(jsonData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+
+
+        document.getElementById('testForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            var formData = new FormData(this);
+            fetch('/test', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('result').innerText = "Predicted Name: " + data.predicted_name;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    </script>
+</body>
+</html>
